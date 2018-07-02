@@ -38,6 +38,7 @@ class _TransactViewState extends State<TransactView>
   @override
   void initState() {
     super.initState();
+    requestPermission(Permission.WriteExternalStorage);
     new Timer(const Duration(seconds: 2), () {
       _utils.readTransCup().then(_onReadTransCup);
     });
@@ -127,7 +128,7 @@ class _TransactViewState extends State<TransactView>
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return new AlertDialog(
-          title: new Text('MetroTrans v0.5'),
+          title: new Text('MetroTrans v1.0'),
           content: new SingleChildScrollView(
             child: new ListBody(
               children: <Widget>[
@@ -152,16 +153,13 @@ class _TransactViewState extends State<TransactView>
   }
 
   requestPermission(Permission permission) async {
-    if(! await SimplePermissions.checkPermission(permission)) {
+    //if(! await SimplePermissions.checkPermission(permission)) {
       bool res = await SimplePermissions.requestPermission(permission);
       print("permission request result is " + res.toString());
-    }
+    //}
   }
 
   Future<File> get _localFile async {
-
-    requestPermission(Permission.WriteExternalStorage);
-
     final path = await _localPath;
     File filePath = File('$path/MetroTrans/transacciones.txt');
 
