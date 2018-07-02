@@ -1,8 +1,6 @@
 # metro_trans
-
-A new Flutter project.
+Transacction viewer for Transfermovil cuban app
 
 ## Getting Started
 
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
+Feel free to contribute
