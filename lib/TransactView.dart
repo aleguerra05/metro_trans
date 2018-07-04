@@ -137,8 +137,9 @@ class _TransactViewState extends State<TransactView>
             child: new ListBody(
               children: <Widget>[
                 new Text(
-                    'Aplicacion solo disponible para clientes del Banco Metropolitano. 2018'),
+                    'Visor de Transaciones de Banco Metropolitano. 2018'),
                 new Text('aleguerra05@gmail.com'),
+                new Text('https://github.com/aleguerra05/metro_trans'),
               ],
             ),
           ),
