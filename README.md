@@ -5,6 +5,13 @@ Transacction viewer for Transfermovil cuban app
 
 Feel free to contribute, clone, pull request, issues, ...
 
+## Thanks
+
+Special thanks to:
+- Flutter SMS developers (This is an SMS library for flutter.)
+- simple_permissions plugin developer
+- call_number plugin developer
+
 ## RoadMap
 
 - [ ] Execute USSD codes from SIM 1 or 2
