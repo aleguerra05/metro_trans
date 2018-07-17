@@ -34,6 +34,7 @@ matrix:
         - export GRADLE_HOME=$PWD/gradle-3.5
         - export PATH=$GRADLE_HOME/bin:$PATH
         - git clone https://github.com/flutter/flutter.git -b beta
+        - flutter doctor --accept-licenses 
       before_install:
         - yes | sdkmanager "platforms;android-27"
       script:
