@@ -34,10 +34,8 @@ matrix:
         - export GRADLE_HOME=$PWD/gradle-3.5
         - export PATH=$GRADLE_HOME/bin:$PATH
         - git clone https://github.com/flutter/flutter.git -b beta		
-      before_install:
-        - yes | sdkmanager "platforms;android-27"
       script:
-        - /usr/local/android-sdk/tools/bin/sdkmanager --update --no-ui
+        - yes | sdkmanager "platforms;android-27"
         - ./flutter/bin/flutter doctor --android-licenses
         - ./flutter/bin/flutter -v build apk
 cache:
