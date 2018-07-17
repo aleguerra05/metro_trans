@@ -241,7 +241,7 @@ class _TransactViewState extends State<TransactView>
         icon: const Icon(Icons.account_balance),
         onPressed: () {
           //launch("tel:*444*48*1%23");
-          _initCall("*444*48*1%23");
+          _initCall("*444*48%23");
         },
         label: const Text("Ultimas Operaciones"),
       ),
