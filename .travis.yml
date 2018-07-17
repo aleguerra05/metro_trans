@@ -1,119 +1,83 @@
 matrix:
+  # This causes the build to complete immediately upon first failure or once
+  # required jobs are green.
+  fast_finish: true
+
+  # Building APK/IPA takes a long time; do not wait for them to finish.
+  allow_failures:
+    - env: JOB=APK
+    - env: JOB=IPA
+
   include:
-    # Job 1) Run analyzer
-    - os: linux
-      env:
-        - SHARD=Analyze
-      sudo: false
-      addons:
-        apt:
-          # Flutter depends on /usr/lib/x86_64-linux-gnu/libstdc++.so.6 version GLIBCXX_3.4.18
-          sources:
-            - ubuntu-toolchain-r-test # if we don't specify this, the libstdc++6 we get is the wrong version
-          packages:
-            - libstdc++6
-            - fonts-droid
-      before_script:
-        - git clone https://github.com/flutter/flutter.git
-        - export PATH=`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin:$PATH
-        - flutter doctor
-        - pub global activate flutter_plugin_tools
-      script:
-        - ./script/incremental_build.sh analyze
-    # Job 2) Check format and run tests
-    - os: linux
-      env:
-        - SHARD=Format+Test
-      jdk: oraclejdk8
-      sudo: false
-      addons:
-        apt:
-          # Flutter depends on /usr/lib/x86_64-linux-gnu/libstdc++.so.6 version GLIBCXX_3.4.18
-          sources:
-            - ubuntu-toolchain-r-test # if we don't specify this, the libstdc++6 we get is the wrong version
-            - llvm-toolchain-precise # for clang-format-5.0
-          packages:
-            - libstdc++6
-            - fonts-droid
-            - clang-format-5.0
-      before_script:
-        - git clone https://github.com/flutter/flutter.git
-        - export PATH=`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin:$PATH
-        - flutter doctor
-        - pub global activate flutter_plugin_tools
-      script:
-        - ./script/incremental_build.sh format --travis --clang-format=clang-format-5.0
-        - ./script/incremental_build.sh test
-    # Job 3.1) Build example APKs and run Java tests, shard 1/2
-    - os: linux
-      env:
-        - SHARD="Build example apks 1/2"
-        - PLUGIN_SHARDING="--shardIndex 0 --shardCount 2"
-      jdk: oraclejdk8
-      sudo: false
-      addons:
-        apt:
-          # Flutter depends on /usr/lib/x86_64-linux-gnu/libstdc++.so.6 version GLIBCXX_3.4.18
-          sources:
-            - ubuntu-toolchain-r-test # if we don't specify this, the libstdc++6 we get is the wrong version
-          packages:
-            - lib32stdc++6 # https://github.com/flutter/flutter/issues/6207
-            - libstdc++6
-            - fonts-droid
-      before_script:
-        - ./script/before_build_apks.sh
-        - export ANDROID_HOME=`pwd`/android-sdk
-        - export PATH=`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin:$PATH
-      script:
-        - ./script/incremental_build.sh build-examples --apk
-        - ./script/incremental_build.sh java-test  # must come after apk build
-    # Job 3.2) Build example APKs and run Java tests, shard 2/2
-    - os: linux
-      env:
-        - SHARD="Build example apks 2/2"
-        - PLUGIN_SHARDING="--shardIndex 1 --shardCount 2"
-      jdk: oraclejdk8
-      sudo: false
-      addons:
-        apt:
-          # Flutter depends on /usr/lib/x86_64-linux-gnu/libstdc++.so.6 version GLIBCXX_3.4.18
-          sources:
-            - ubuntu-toolchain-r-test # if we don't specify this, the libstdc++6 we get is the wrong version
-          packages:
-            - lib32stdc++6 # https://github.com/flutter/flutter/issues/6207
-            - libstdc++6
-            - fonts-droid
-      before_script:
-        - ./script/before_build_apks.sh
-        - export ANDROID_HOME=`pwd`/android-sdk
-        - export PATH=`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin:$PATH
-      script:
-        - ./script/incremental_build.sh build-examples --apk
-        - ./script/incremental_build.sh java-test  # must come after apk build
-    # Job 4.1) Build example IPAs, shard 1/2
-    - os: osx
-      env:
-        - SHARD="Build example ipas 1/2"
-        - PLUGIN_SHARDING="--shardIndex 0 --shardCount 2"
+    # Runs unit tests without emulators.
+    - env: JOB=PR
+      os: linux
       language: generic
-      osx_image: xcode9.3
+      sudo: false
+      addons:
+        apt:
+          # Flutter depends on /usr/lib/x86_64-linux-gnu/libstdc++.so.6 version GLIBCXX_3.4.18
+          sources:
+            - ubuntu-toolchain-r-test # if we don't specify this, the libstdc++6 we get is the wrong version
+          packages:
+            - libstdc++6
+            - fonts-droid
       before_script:
-        - ./script/before_build_ipas.sh
-        - export PATH=`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin:$PATH
+        - git clone https://github.com/flutter/flutter.git -b alpha --depth 1
       script:
-        - ./script/incremental_build.sh build-examples --ipa
-    # Job 4.2) Build example IPAs, shard 2/2
-    - os: osx
-      env:
-        - SHARD="Build example ipas 2/2"
-        - PLUGIN_SHARDING="--shardIndex 1 --shardCount 2"
+        - ./flutter/bin/flutter test
+
+    # Builds an APK.
+    - env: JOB=APK
+      os: linux
+      language: android
+      licenses:
+        - 'android-sdk-preview-license-.+'
+        - 'android-sdk-license-.+'
+        - 'google-gdk-license-.+'
+      android:
+        components:
+          - tools
+          - platform-tools
+          - build-tools-25.0.3
+          - android-25
+          - sys-img-armeabi-v7a-google_apis-25
+          - extra-android-m2repository
+          - extra-google-m2repository
+          - extra-google-android-support
+      jdk: oraclejdk8
+      sudo: false
+      addons:
+        apt:
+          # Flutter depends on /usr/lib/x86_64-linux-gnu/libstdc++.so.6 version GLIBCXX_3.4.18
+          sources:
+            - ubuntu-toolchain-r-test # if we don't specify this, the libstdc++6 we get is the wrong version
+          packages:
+            - libstdc++6
+            - fonts-droid
+      before_script:
+        - wget http://services.gradle.org/distributions/gradle-3.5-bin.zip
+        - unzip -qq gradle-3.5-bin.zip
+        - export GRADLE_HOME=$PWD/gradle-3.5
+        - export PATH=$GRADLE_HOME/bin:$PATH
+        - git clone https://github.com/flutter/flutter.git -b alpha --depth 1
+      script:
+        - ./flutter/bin/flutter -v build apk
+
+    # Builds an IPA.
+    - env: JOB=IPA
+      os: osx
       language: generic
-      osx_image: xcode9.3
+      osx_image: xcode8.3
       before_script:
-        - ./script/before_build_ipas.sh
-        - export PATH=`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin:$PATH
+        - pip install six
+        - brew update
+        - brew install --HEAD libimobiledevice
+        - brew install ideviceinstaller
+        - brew install ios-deploy
+        - git clone https://github.com/flutter/flutter.git -b alpha --depth 1
       script:
-        - ./script/incremental_build.sh build-examples --ipa
+        - ./flutter/bin/flutter -v build ios --no-codesign
 
 cache:
   directories:
