@@ -37,7 +37,7 @@ matrix:
       before_install:
         - yes | sdkmanager "platforms;android-27"
       script:
-        - flutter doctor --android-licenses
+        - ./flutter/bin/flutter doctor --android-licenses
         - ./flutter/bin/flutter -v build apk
 cache:
   directories:
