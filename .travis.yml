@@ -12,6 +12,17 @@ addons:
 before_script:
   - git clone https://github.com/flutter/flutter.git -b beta
   - ./flutter/bin/flutter doctor
+android:
+  components:
+    - tools
+    - platform-tools
+    - build-tools-25.0.3
+    - android-25
+    - extra-android-support
+    - extra-google-google_play_services
+    - extra-android-m2repository
+    - extra-google-m2repository
+    - addon-google_apis-google-21
 script:
   - ./flutter/bin/flutter build apk
 cache:
