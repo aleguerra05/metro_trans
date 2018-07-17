@@ -37,7 +37,7 @@ matrix:
       before_install:
         - yes | sdkmanager "platforms;android-27"
       script:
-        - /usr/local/android-sdk/tools/bin/sdkmanager --update --licenses
+        - /usr/local/android-sdk/tools/bin/sdkmanager --update --no-ui
         - ./flutter/bin/flutter doctor --android-licenses
         - ./flutter/bin/flutter -v build apk
 cache:
