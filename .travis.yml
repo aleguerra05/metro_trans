@@ -35,7 +35,9 @@ matrix:
         - export PATH=$GRADLE_HOME/bin:$PATH
         - git clone https://github.com/flutter/flutter.git -b beta		
       script:
-        - yes | sdkmanager "platforms;android-27;build-tools"
+        - yes | sdkmanager "platforms;android-27"
+        - yes | sdkmanager "build-tools;27.0.2"
+        - yes | sdkmanager "build-tools;26.0.2"
         #- ./flutter/bin/flutter doctor --android-licenses
         - ./flutter/bin/flutter -v build apk
 cache:
