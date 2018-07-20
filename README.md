@@ -17,7 +17,7 @@ Special thanks to:
 - [x] Adding travis-ci automatic build
 - [ ] Execute USSD codes from SIM 1 or 2
 - [ ] Graph with account balance
-- [ ] Support for 2 accounts (CUP & CUC)
+- [x] Support for 2 accounts (CUP & CUC)
 - [ ] Improve Transactions Details
 - [ ] Allow receive sms and auto-update transaction list
 - [ ] Improve connect/disconnect button based on sms messages history
@@ -27,5 +27,6 @@ Special thanks to:
 ## Bugs
 
 - [x] Write External Storage access deny
-- [ ] Update balance USSD code dosen't works
+- [x] Update balance USSD code dosen't works
 - [ ] First run request SMS access and after that does not refresh transactions list
+- [ ] Transaction list is unsorted
