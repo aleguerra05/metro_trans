@@ -14,6 +14,7 @@ Special thanks to:
 
 ## RoadMap
 
+- [x] Adding travis-ci automatic build
 - [ ] Execute USSD codes from SIM 1 or 2
 - [ ] Graph with account balance
 - [ ] Support for 2 accounts (CUP & CUC)

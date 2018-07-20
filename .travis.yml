@@ -36,8 +36,17 @@ matrix:
         - git clone https://github.com/flutter/flutter.git -b beta		
       script:
         - yes | sdkmanager "platforms;android-27"
-        - ./flutter/bin/flutter doctor --android-licenses
+        - yes | sdkmanager "build-tools;27.0.2"
+        - yes | sdkmanager "build-tools;26.0.2"
+        #- ./flutter/bin/flutter doctor --android-licenses
         - ./flutter/bin/flutter -v build apk
+      deploy:
+        provider: releases
+        api_key: $GITHUB_TOKEN
+        file: build/app/outputs/apk/release/app-release.apk
+        skip_cleanup: true
+        on:
+          tags: true
 cache:
   directories:
     - $HOME/.pub-cache
