@@ -18,7 +18,8 @@ class TransactView extends StatefulWidget {
 class _TransactViewState extends State<TransactView>
     with TickerProviderStateMixin {
   bool _loading = true;
-  List<Transaccion> _transactions;
+  List<Transaccion> _transactionsCup;
+  List<Transaccion> _transactionsCuc;
   int _simNumber = 1;
   bool _isConnected = false;
 
@@ -27,7 +28,9 @@ class _TransactViewState extends State<TransactView>
   // Animation
   AnimationController opacityController;
 
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey<
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKeyCup = new GlobalKey<
+      RefreshIndicatorState>();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKeyCuc = new GlobalKey<
       RefreshIndicatorState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -37,7 +40,11 @@ class _TransactViewState extends State<TransactView>
     super.initState();
 
     new Timer(const Duration(seconds: 2), () {
-      _utils.readTransCup().then(_onReadTransCup);
+      _utils.ReadSms().then((messages){
+        _utils.readTransCup(messages).then(_onReadTransCup);
+        _utils.readTransCuc(messages).then(_onReadTransCuc);
+      });
+
     });
 
 
@@ -46,18 +53,36 @@ class _TransactViewState extends State<TransactView>
         duration: const Duration(milliseconds: 500), vsync: this, value: 0.0);
   }
 
-  void _onReadTransCup(List<Transaccion> transacciones) {
-    _transactions = transacciones;
-    print("OnSmsLoaded");
+  void _onReadTransCup(List<Transaccion> transaccionesCup) {
+    _transactionsCup = transaccionesCup;
+    print("OnSmsLoadedCup");
     //cprint(_transactions);
     _checkIfLoadCompleted();
   }
 
-  void _onFinishReload(List<Transaccion> transacciones) {
-    _transactions = transacciones;
-    print("OnSmsReloaded");
+  void _onReadTransCuc(List<Transaccion> transaccionesCuc) {
+    _transactionsCuc = transaccionesCuc;
+    print("OnSmsLoadedCuc");
+    //cprint(_transactions);
+    _checkIfLoadCompleted();
+  }
+
+  void _onFinishReloadCup(List<Transaccion> transaccionesCup) {
+    _transactionsCup = transaccionesCup;
+    print("OnSmsReloadedCup");
     //print(_transactions);
-    if (_transactions != null) {
+    if (_transactionsCup != null) {
+      setState(() {
+        _loading = false;
+        //opacityController.animateTo(1.0, curve: Curves.easeIn);
+      });
+    }
+  }
+  void _onFinishReloadCuc(List<Transaccion> transaccionesCuc) {
+    _transactionsCuc = transaccionesCuc;
+    print("OnSmsReloadedCuc");
+    //print(_transactions);
+    if (_transactionsCuc != null) {
       setState(() {
         _loading = false;
         //opacityController.animateTo(1.0, curve: Curves.easeIn);
@@ -97,7 +122,7 @@ class _TransactViewState extends State<TransactView>
   }
 
   void _checkIfLoadCompleted() {
-    if (_transactions != null) {
+    if (_transactionsCup != null && _transactionsCuc!=null) {
       setState(() {
         _loading = false;
         opacityController.animateTo(1.0, curve: Curves.easeIn);
@@ -108,10 +133,15 @@ class _TransactViewState extends State<TransactView>
   Future<Null> _handleRefresh() {
     final Completer<Null> completer = new Completer<Null>();
 
-    _utils.readTransCup().then(_onFinishReload);
+    _utils.ReadSms().then((messages){
 
-    new Timer(const Duration(seconds: 2), () {
-      completer.complete(null);
+      _utils.readTransCup(messages).then(_onFinishReloadCup);
+      _utils.readTransCuc(messages).then(_onFinishReloadCuc);
+
+      new Timer(const Duration(seconds: 2), () {
+        completer.complete(null);
+      });
+
     });
     return completer.future.then((_) {
       _scaffoldKey.currentState?.showSnackBar(new SnackBar(
@@ -119,7 +149,7 @@ class _TransactViewState extends State<TransactView>
           action: new SnackBarAction(
               label: 'RETRY',
               onPressed: () {
-                _refreshIndicatorKey.currentState.show();
+                _refreshIndicatorKeyCup.currentState.show();
               }
           )
       ));
@@ -132,24 +162,32 @@ class _TransactViewState extends State<TransactView>
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return new AlertDialog(
-          title: new Text('MetroTrans v1.0'),
+          title: new Text('MetroTrans v0.6 beta'),
           content: new SingleChildScrollView(
             child: new ListBody(
               children: <Widget>[
-                new Text(
-                    'Visor de Transaciones de Banco Metropolitano. 2018'),
-                new Text('aleguerra05@gmail.com'),
-                new Text('https://github.com/aleguerra05/metro_trans'),
+                new Text('Visor de Transaciones de Banco Metropolitano.\n'),
+                new Text('Ayúdenos a continuar desarrollando la aplicación.'),
+                new Text('Envíe sus donativos al (+53)53337949'),
               ],
             ),
           ),
           actions: <Widget>[
-            new FlatButton(
-              child: new Text('Aceptar'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
+
+            new Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,children: [
+              new FlatButton(onPressed: (){
+                _initCall("*234*1*53337949%23");
+              }, child: new Text('Donar 30 centavos', style: new TextStyle(color: Colors.red),)),
+              new FlatButton(
+                child: new Text('Aceptar'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],),
+
+
+
           ],
         );
       },
@@ -194,9 +232,9 @@ class _TransactViewState extends State<TransactView>
 
     String content = 'fecha;id_Transaccion;credito;debito;moneda;operacion;servicio;saldo\n';
 
-    _transactions.sort((a, b) => a.fecha.compareTo(b.fecha));
+    _transactionsCup.sort((a, b) => a.fecha.compareTo(b.fecha));
 
-    _transactions.forEach((t){
+    _transactionsCup.forEach((t){
       content += t.fecha.year.toString()+'/'+t.fecha.month.toString()+'/'+t.fecha.day.toString()+';';
       content += t.noTransaccion.toString()+';';
       if(t.operacion==TIPO_TRANSACCION.DEBITO)
@@ -215,8 +253,12 @@ class _TransactViewState extends State<TransactView>
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+
+    return new DefaultTabController(length: 2, child:
+
+    new Scaffold(
       appBar: new AppBar(
+        bottom: new TabBar(tabs: [new Tab(text: 'CUP',),new Tab(text: 'CUC',)]),
         title: new Text('MetroTrans'),
         actions: [
           new IconButton(icon: new Icon(Icons.help_outline),
@@ -231,19 +273,27 @@ class _TransactViewState extends State<TransactView>
           }),
         ],
       ),
-      body: new RefreshIndicator(
-          key: _refreshIndicatorKey,
-          onRefresh: _handleRefresh,
-          child:
+      body:
+          new TabBarView(children: [
+            new RefreshIndicator(
+                key: _refreshIndicatorKeyCup,
+                onRefresh: _handleRefresh,
+                child: _getTtransactViewWidgetsCup()),
+            new RefreshIndicator(
+                key: _refreshIndicatorKeyCuc,
+                onRefresh: _handleRefresh,
+                child: _getTtransactViewWidgetsCuc()),
+          ]),
 
-          _getTtransactViewWidgets()),
+
+
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.account_balance),
         onPressed: () {
           //launch("tel:*444*48*1%23");
           _initCall("*444*48%23");
         },
-        label: const Text("Ultimas Operaciones"),
+        label: const Text("Ultimas Operaciones"), tooltip: "Consultar transacciones",
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
@@ -253,13 +303,13 @@ class _TransactViewState extends State<TransactView>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             IconButton(
-              icon: _isConnected ? Icon(Icons.link) : Icon(Icons.link_off),
+              icon: _isConnected ? Icon(Icons.link,) : Icon(Icons.link_off,),
               onPressed: _changeConnectionStatus,
-              tooltip: "Autenticarse",),
+              tooltip: "Conectarse/Desconectarse",),
             new Stack(children: <Widget>[
               IconButton(icon: Icon(Icons.sd_card),
                   onPressed: _changeSimNumber,
-                  tooltip: _simNumber.toString()),
+                  tooltip: "Sim "+_simNumber.toString()),
               Container(
                 margin: const EdgeInsets.only(left: 20.0, top: 20.0), child:
               Text(_simNumber.toString(),
@@ -269,10 +319,30 @@ class _TransactViewState extends State<TransactView>
           ],
         ),
       ),
-    );
+    ));
   }
 
-  Widget _getTtransactViewWidgets() {
+  Widget _getTtransactViewWidgetsCup() {
+
+      if (_loading) {
+        return new Center(
+          child: new CircularProgressIndicator(),
+        );
+      } else {
+        return new FadeTransition(
+          opacity: opacityController,
+          child: new ListView.builder(
+              padding: kMaterialListPadding,
+              itemCount:_transactionsCup.length,
+              itemBuilder: (context, index) {
+                  return new TransactItem(_transactionsCup[index]);
+              }),
+        );
+      }
+  }
+
+  Widget _getTtransactViewWidgetsCuc() {
+
     if (_loading) {
       return new Center(
         child: new CircularProgressIndicator(),
@@ -282,9 +352,9 @@ class _TransactViewState extends State<TransactView>
         opacity: opacityController,
         child: new ListView.builder(
             padding: kMaterialListPadding,
-            itemCount: _transactions.length,
+            itemCount:_transactionsCuc.length,
             itemBuilder: (context, index) {
-              return new TransactItem(_transactions[index]);
+              return new TransactItem(_transactionsCuc[index]);
             }),
       );
     }

@@ -6,6 +6,7 @@ class Utils {
 
   List<Transaccion> transaccionesCUP;
   List<Transaccion> transaccionesCUC;
+  List<SmsMessage> mensajes;
 
   static List<Transaccion> MessageToTransaction(SmsMessage message) {
     Transaccion transaccion = new Transaccion();
@@ -87,11 +88,17 @@ class Utils {
     return list;
   }
 
-  Future<List<Transaccion>> readTransCup() async {
+  Future<List<SmsMessage>> ReadSms() async
+  {
+    SmsQuery query = new SmsQuery();
+    return await query.querySms(address: "PAGOxMOVIL");
+  }
+
+  Future<List<Transaccion>> readTransCup(List<SmsMessage> smsCollection) async {
     List<Transaccion> transCUP = new List<Transaccion>();
     List<Saldo> saldosCUP = new List<Saldo>();
-    SmsQuery query = new SmsQuery();
-    final smsCollection = await query.querySms(address: "PAGOxMOVIL");
+    //SmsQuery query = new SmsQuery();
+    //final smsCollection = await query.querySms(address: "PAGOxMOVIL");
     smsCollection.forEach((SmsMessage sms) {
       List<Transaccion> trans = MessageToTransaction(sms);
       List<Transaccion> transactionsCUP = new List<Transaccion>();
@@ -123,11 +130,11 @@ class Utils {
     return transFinal;
   }
 
-  Future<List<Transaccion>> readTransCuc() async {
+  Future<List<Transaccion>> readTransCuc(List<SmsMessage> smsCollection) async {
     List<Transaccion> transCUC = new List<Transaccion>();
     List<Saldo> saldosCUC = new List<Saldo>();
-    SmsQuery query = new SmsQuery();
-    final smsCollection = await query.querySms(address: "PAGOxMOVIL");
+    //SmsQuery query = new SmsQuery();
+    //final smsCollection = await query.querySms(address: "PAGOxMOVIL");
     smsCollection.forEach((SmsMessage sms) {
       List<Transaccion> trans = MessageToTransaction(sms);
       List<Transaccion> transactionsCUC = new List<Transaccion>();
@@ -179,6 +186,12 @@ class Utils {
     }
 
     for (int i = 0; i < transacciones.length; i++) {
+
+      if (i==0&&transacciones[i].saldo==0) {
+        transacciones[i].saldo = saldos[0].monto;
+        continue;
+      }
+
       if (transacciones[i].saldo == 0) {
         if (transacciones[i].operacion == TIPO_TRANSACCION.DEBITO) {
           transacciones[i].saldo =

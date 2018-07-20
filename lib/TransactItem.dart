@@ -1,7 +1,6 @@
 import 'utils/Transaccion.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
-import 'item_details.dart';
 
 class TransactItem extends StatelessWidget {
   final Transaccion transaccion;
@@ -57,9 +56,9 @@ class TransactItem extends StatelessWidget {
         title: new Row(children: <Widget>[
           new Expanded(
               child: new Text(
-                  transaccion.monto.toStringAsFixed(2) + " " + "CUP")),
+                  transaccion.monto.toStringAsFixed(2) + " " + (transaccion.moneda==TIPO_MONEDA.CUP?"CUP":"CUC"))),
           new Icon(Icons.account_balance, size: 10.0,),
-          new Text(transaccion.saldo.toStringAsFixed(2) + " CUP"),
+          new Text(transaccion.saldo.toStringAsFixed(2) + (transaccion.moneda==TIPO_MONEDA.CUP?"CUP":"CUC")),
         ]),
         subtitle:
         new Row(children: <Widget>[
@@ -70,15 +69,29 @@ class TransactItem extends StatelessWidget {
               transaccion.fecha.year.toString()),
 
         ]),
-        //trailing: new Badge(thread.messages),
+
         onTap: () {
-          Navigator.push(
-            context,
-            new MaterialPageRoute(
-              builder: (_) => new ItemDetails(item: transaccion),
-            ),
-          );
+          showDialog(context: context, builder: (BuildContext context) {
+            return new Dialog(
+                child: new Card(child: new ListTile(
+                  leading: getTypeServiceIcon(transaccion),
+                  title: new Text(transaccion.noTransaccion + '\n' +
+                      getTypeServiceText(transaccion)),
+                  subtitle:
+                  new Row(children: <Widget>[
+                    new Expanded(child: new Text(
+                        transaccion.monto.toStringAsFixed(2) +" "+ (transaccion.moneda==TIPO_MONEDA.CUP?"CUP":"CUC"))),
+                    new Icon(Icons.calendar_today, size: 10.0),
+                    new Text(transaccion.fecha.day.toString() + "/" +
+                        transaccion.fecha.month.toString() + "/" +
+                        transaccion.fecha.year.toString())
+                  ]),
+                )
+              )
+            );
+          });
         },
-      ));
+      )
+    );
   }
 }
