@@ -1,6 +1,10 @@
 # metro_trans
 Transacction viewer for Transfermovil cuban app
 
+## Download Android App
+[MetroTrans](https://github.com/aleguerra05/metro_trans/releases/download/0.6-beta/app-release.apk)
+
+
 ## Getting Started
 
 Feel free to contribute, clone, pull request, issues, ...
