@@ -6,8 +6,8 @@ Transacction viewer for Transfermovil cuban app
 
 ## Snapshots
 
-<img src="https://github.com/aleguerra05/metro_trans/blob/master/screenshots/Screenshot_1.png" alt="Snapshot 1" width="200px"/>
-<img src="https://github.com/aleguerra05/metro_trans/blob/master/screenshots/Screenshot_2.png" alt="Snapshot 2" width="200px"/>
+<img src="https://github.com/aleguerra05/metro_trans/blob/master/screenshots/Screenshot_1.png?raw=true" alt="Snapshot 1" width="200px"/>
+<img src="https://github.com/aleguerra05/metro_trans/blob/master/screenshots/Screenshot_2.png?raw=true" alt="Snapshot 2" width="200px"/>
 
 ## Getting Started
 
