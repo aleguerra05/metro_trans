@@ -14,5 +14,6 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: "stable"
+          flutter-version: '1.9.1+hotfix.6'
       - run: flutter pub get
       - run: flutter build apk --release --target-platform android-arm
